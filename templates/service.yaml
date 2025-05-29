@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dynamo-db-local-helm.fullname" . }}
+  labels:
+    {{- include "dynamo-db-local-helm.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      name: http
+  selector:
+    {{- include "dynamo-db-local-helm.selectorLabels" . | nindent 4 }}

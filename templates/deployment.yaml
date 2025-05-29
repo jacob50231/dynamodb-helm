@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dynamo-db-local-helm.fullname" . }}
+  labels:
+    {{- include "dynamo-db-local-helm.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "dynamo-db-local-helm.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "dynamo-db-local-helm.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: dynamodb-local
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "-jar"
+            - "DynamoDBLocal.jar"
+            - "-sharedDb"
+          ports:
+            - containerPort: 8000
+              name: http
+          volumeMounts:
+            - name: dynamodb-storage
+              mountPath: /home/dynamodblocal/data
+      volumes:
+        - name: dynamodb-storage
